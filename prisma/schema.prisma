@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String          @id @default(cuid())
+  email                 String          @unique
+  name                  String
+  password              String
+  phone                 String?
+  country               String?
+  verified              Boolean         @default(false)
+  
+  // حقول مالية احترافية
+  zenBalance            Float           @default(0)           // رصيد عملة ZEN
+  totalInvested         Float           @default(0)           // إجمالي الأموال المستثمرة
+  totalProfit           Float           @default(0)           // الأرباح الإجمالية
+  accountStatus         String          @default("ACTIVE")    // حالة الحساب
+  investmentTier        String          @default("BEGINNER")  // مستوى الاستثمار
+  
+  lastLogin             DateTime?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  
+  portfolio             Portfolio?
+  investments           Investment[]
+  transactions          Transaction[]
+  wallets               Wallet[]
+  referrals             Referral[]
+  settings              UserSettings?
+  activities            Activity[]
+  
+  @@index([email])
+  @@index([accountStatus])
+  @@map("users")
+}
+
+model UserSettings {
+  id                    String          @id @default(cuid())
+  userId                String          @unique
+  twoFactorEnabled      Boolean         @default(false)
+  notificationsEnabled  Boolean         @default(true)
+  language              String          @default("ar")
+  currency              String          @default("USD")
+  
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_settings")
+}
+
+model Portfolio {
+  id                    String          @id @default(cuid())
+  userId                String          @unique
+  totalInvested         Float           @default(0)
+  totalProfit           Float           @default(0)
+  currentValue          Float           @default(0)
+  roi                   Float           @default(0)
+  zensHolding           Float           @default(0)
+  lastUpdated           DateTime        @default(now()) @updatedAt
+  
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  investments           Investment[]
+  
+  @@map("portfolios")
+}
+
+model Investment {
+  id                    String          @id @default(cuid())
+  portfolioId           String
+  userId                String
+  tierId                String
+  amount                Float
+  dailyReturnRate       Float           @default(0.8)
+  startDate             DateTime        @default(now())
+  endDate               DateTime?
+  status                String          @default("ACTIVE")
+  expectedReturn        Float
+  actualReturn          Float           @default(0)
+  createdAt             DateTime        @default(now())
+  
+  portfolio             Portfolio       @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tier                  InvestmentTier  @relation(fields: [tierId], references: [id])
+  
+  @@index([portfolioId])
+  @@index([userId])
+  @@map("investments")
+}
+
+model InvestmentTier {
+  id                    String          @id @default(cuid())
+  name                  String          @unique
+  minAmount             Float
+  maxAmount             Float
+  dailyReturnPercent    Float
+  monthlyReturnPercent  Float
+  annualReturnPercent   Float
+  description           String
+  color                 String          @default("#d4af37")
+  icon                  String?
+  active                Boolean         @default(true)
+  
+  investments           Investment[]
+  
+  @@map("investment_tiers")
+}
+
+model Wallet {
+  id                    String          @id @default(cuid())
+  userId                String
+  walletAddress         String
+  blockchain            String
+  balance               Float           @default(0)
+  verified              Boolean         @default(false)
+  createdAt             DateTime        @default(now())
+  
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, walletAddress])
+  @@map("wallets")
+}
+
+model Transaction {
+  id                    String          @id @default(cuid())
+  userId                String
+  type                  String
+  amount                Float
+  currency              String          @default("USDT")
+  status                String          @default("PENDING")
+  txHash                String?
+  description           String?
+  createdAt             DateTime        @default(now())
+  
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@map("transactions")
+}
+
+model Referral {
+  id                    String          @id @default(cuid())
+  referrerId            String
+  referralCode          String          @unique
+  commission            Float           @default(10)
+  totalEarnings         Float           @default(0)
+  referralCount         Int             @default(0)
+  createdAt             DateTime        @default(now())
+  
+  referrer              User            @relation(fields: [referrerId], references: [id], onDelete: Cascade)
+  
+  @@map("referrals")
+}
+
+model Activity {
+  id                    String          @id @default(cuid())
+  userId                String
+  action                String
+  description           String?
+  metadata              String?
+  ipAddress             String?
+  createdAt             DateTime        @default(now())
+  
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@map("activities")
+}
