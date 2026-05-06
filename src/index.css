@@ -1,9 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-body { font-family: 'Cairo', sans-serif; background: #0a0a0f; color: white; }
-.gold-text { background: linear-gradient(135deg, #f5c518, #ffe680); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.gold-gradient { background: linear-gradient(135deg, #f5c518, #d4a810); }
-.glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
-.btn-gold { background: linear-gradient(135deg, #f5c518, #d4a810); color: #0a0a0f; font-weight: 700; }
-.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(245,197,24,0.4); }
+@tailwind base;@tailwind components;@tailwind utilities;
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Cairo',sans-serif;background:#0a0a0f;color:#fff;direction:rtl}
+.gold-text{background:linear-gradient(135deg,#f5c518,#ffe680);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gold-gradient{background:linear-gradient(135deg,#f5c518,#d4a810)}.glass{background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08)}
+.btn-gold{background:linear-gradient(135deg,#f5c518,#d4a810);color:#0a0a0f;font-weight:700;transition:all 0.3s}.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(245,197,24,0.4)}
